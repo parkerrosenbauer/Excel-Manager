@@ -7,8 +7,11 @@ class ExcelMgr():
         path -- path to excel file
         """
         self.path = path
+        
+    @property
+    def sheets(self):
         xl = pd.ExcelFile(self.path)
-        self.sheets = (list(xl.sheet_names))
+        return list(xl.sheet_names)
         
     def __contains__(self, sheet: str):
         """Return True if sheet is in the excel file."""
