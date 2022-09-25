@@ -2,14 +2,14 @@ import pandas as pd
 from pathlib import Path
 
 class ExcelMgr:
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path):
         """Create ExcelMgr object.
 
         path -- path to excel file
         """
         self.path = path
 
-    def __contains__(self, sheet: str) -> bool:
+    def __contains__(self, sheet: str):
         """Return true if sheet present in excel file.
 
         sheet -- sheet to search for
@@ -40,14 +40,14 @@ class ExcelMgr:
             return SheetMgr(self.path, item)
 
     @property
-    def sheets(self) -> list:
+    def sheets(self):
         """Return sheets in excel file"""
         xl = pd.ExcelFile(self.path)
         return (list(xl.sheet_names))
 
 
 class SheetMgr(ExcelMgr):
-    def __init__(self, path: Path, sheet: str) -> None:
+    def __init__(self, path: Path, sheet: str):
         """Create SheetMgr object.
 
         path -- path to excel file
@@ -59,22 +59,22 @@ class SheetMgr(ExcelMgr):
         else:
             raise LookupError('That sheet name does not exist in file.')
 
-    def __contains__(self, column: str) -> bool:
+    def __contains__(self, column: str):
         """Return True if column present in sheet."""
         return column in self.columns
 
     @property
-    def columns(self) -> list:
+    def columns(self):
         """Return list of columns in sheet."""
         return list(self.data.columns)
 
     @property
-    def data(self) -> pd.DataFrame:
+    def data(self):
         """Return a dataframe of the sheet"""
         return pd.read_excel(self.path, sheet_name=self.sheet)
 
     @property
-    def record_count(self) -> int:
+    def record_count(self):
         """Return count of rows in sheet"""
         return len(self.data.index)
 
