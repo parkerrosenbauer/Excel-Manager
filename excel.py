@@ -1,17 +1,17 @@
 import pandas as pd
-from pathlib import Path
+import os
+import re
+
 
 class ExcelMgr:
-    def __init__(self, path: Path):
+    def __init__(self, path: str):
         """Create ExcelMgr object.
-
-        path -- path to excel file
+        path -- path to Excel file
         """
         self.path = path
 
     def __contains__(self, sheet: str):
-        """Return true if sheet present in excel file.
-
+        """Return true if sheet present in Excel file.
         sheet -- sheet to search for
         """
         return sheet in self.sheets
@@ -41,15 +41,14 @@ class ExcelMgr:
 
     @property
     def sheets(self):
-        """Return sheets in excel file"""
+        """Return sheets in Excel file"""
         xl = pd.ExcelFile(self.path)
-        return (list(xl.sheet_names))
+        return list(xl.sheet_names)
 
 
 class SheetMgr(ExcelMgr):
-    def __init__(self, path: Path, sheet: str):
+    def __init__(self, path: str, sheet: str):
         """Create SheetMgr object.
-
         path -- path to excel file
         sheet -- sheet to read from
         """
@@ -57,7 +56,7 @@ class SheetMgr(ExcelMgr):
         if sheet in self.sheets:
             self.sheet = sheet
         else:
-            raise LookupError('That sheet name does not exist in file.')
+            raise LookupError(f'{sheet} does not exist in file.')
 
     def __contains__(self, column: str):
         """Return True if column present in sheet."""
@@ -78,9 +77,34 @@ class SheetMgr(ExcelMgr):
         """Return count of rows in sheet"""
         return len(self.data.index)
 
+    def _col_nexist(func):
+        def wrapper(self, column, *args, **kwargs):
+            if column not in self.columns:
+                raise LookupError(f'That column does not exist in {self.sheet}')
+            return func(self, column, *args, **kwargs)
+        return wrapper
+
+    @_col_nexist
     def column_row_count(self, column: str) -> int:
         """Return count of items in column.
         
         column -- column containing items
         """
         return self.data[column].count()
+
+    @_col_nexist
+    def column_unique_vals(self, column: str) -> list:
+        """Return unique values in a column.
+
+        column -- column containing items
+        """
+        return list(self.data[column].unique())
+
+    def save_to_csv(self) -> None:
+        """Save sheet data to csv in format FileName-SheetName."""
+        pd.io.formats.excel.ExcelFormatter.header_style = None
+
+        base_name = re.sub('.xlsx$', '', os.path.basename(self.path))
+        bare_path = os.path.dirname(self.path)
+        csv_path = os.path.join(bare_path, f"{base_name}-{self.sheet}.csv")
+        self.data.to_csv(csv_path, index=False)
