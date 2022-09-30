@@ -1,2 +1,2 @@
 # Excel-Manager
-A custom python module to allow me to better interact with excel
+Custom modules I've created to better allow me to interact with Microsoft applications like Excel and Access both at work and for personal projects.
