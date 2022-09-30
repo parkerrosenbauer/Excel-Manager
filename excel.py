@@ -78,6 +78,7 @@ class SheetMgr(ExcelMgr):
         return len(self.data.index)
 
     def _col_nexist(func):
+        """Returns error if column doesn't exist"""
         def wrapper(self, column, *args, **kwargs):
             if column not in self.columns:
                 raise LookupError(f'That column does not exist in {self.sheet}')
